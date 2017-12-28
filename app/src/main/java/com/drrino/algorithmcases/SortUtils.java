@@ -1,7 +1,30 @@
 package com.drrino.algorithmcases;
 
 import android.util.Log;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * 一、稳定性:
+ * 　   稳定：冒泡排序、插入排序、归并排序和基数排序
+ * 　　不稳定：选择排序、快速排序、希尔排序、堆排序
+ * 二、平均时间复杂度
+ * 　　O(n^2):直接插入排序，简单选择排序，冒泡排序。
+ * 　　在数据规模较小时（9W内），直接插入排序，简单选择排序差不多。当数据较大时，冒泡排序算法的时间代价最高。性能为O(n^2)的算法基本上是相邻元素进行比较，基本上都是稳定的。
+ * 　　O(nlogn):快速排序，归并排序，希尔排序，堆排序。
+ * 　　其中，快排是最好的， 其次是归并和希尔，堆排序在数据量很大时效果明显。
+ * 三、排序算法的选择
+ * 　　1.数据规模较小
+ * 　　（1）待排序列基本序的情况下，可以选择直接插入排序；
+ * 　　（2）对稳定性不作要求宜用简单选择排序，对稳定性有要求宜用插入或冒泡
+ * 　　2.数据规模不是很大
+ * 　　（1）完全可以用内存空间，序列杂乱无序，对稳定性没有要求，快速排序，此时要付出log（N）的额外空间。
+ * 　　（2）序列本身可能有序，对稳定性有要求，空间允许下，宜用归并排序
+ * 　　3.数据规模很大
+ * 　　（1）对稳定性有求，则可考虑归并排序。
+ * 　　（2）对稳定性没要求，宜用堆排序
+ * 　　4.序列初始基本有序（正序），宜用直接插入，冒泡
+ */
 public class SortUtils {
     private static final String TAG = "Tag";
 
@@ -21,13 +44,15 @@ public class SortUtils {
         int N = a.length;
         for (int i = 1; i < N; i++) {
             for (int j = i; j > 0 && a[j] < a[j - 1]; j--) {
-                exchange(a, j, j-1);
+                exchange(a, j, j - 1);
             }
         }
         for (int anA : a) {
             Log.e(TAG, anA + "");
         }
     }
+
+    //=====================================================================================================
 
 
     /**
@@ -61,6 +86,8 @@ public class SortUtils {
         }
     }
 
+    //=====================================================================================================
+
 
     /**
      * 希尔排序
@@ -74,7 +101,7 @@ public class SortUtils {
         while (h >= 1) {
             for (int i = h; i < N; i++) {
                 for (int j = i; j >= h && a[j] < a[j - h]; j -= h) {
-                    exchange(a, j, j-h);
+                    exchange(a, j, j - h);
                 }
             }
             h = h / 3;
@@ -83,6 +110,8 @@ public class SortUtils {
             Log.e(TAG, anA + "");
         }
     }
+
+    //=====================================================================================================
 
 
     /**
@@ -103,6 +132,8 @@ public class SortUtils {
             Log.e(TAG, anA + "");
         }
     }
+
+    //=====================================================================================================
 
 
     /**
@@ -148,6 +179,163 @@ public class SortUtils {
                     break;
                 }
             }
+        }
+    }
+
+    //=====================================================================================================
+
+
+    /**
+     * 冒泡排序
+     */
+    static void BubbleSort(int[] a) {
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < a.length - i - 1; j++) {
+                if (a[j] > a[j + 1]) {
+                    exchange(a, j, j + 1);
+                }
+            }
+        }
+        for (int anA : a) {
+            Log.e(TAG, anA + "");
+        }
+    }
+
+    //=====================================================================================================
+
+
+    /**
+     * 快速排序
+     */
+    static void QuickSort(int[] a) {
+        quickSort(a, 0, a.length - 1);
+
+        for (int anA : a) {
+            Log.e(TAG, anA + "");
+        }
+    }
+
+
+    private static void quickSort(int[] a, int low, int high) {
+        if (low < high) {//不加这个判断递归会无法退出导致堆栈溢出异常
+            int middle = getMiddle(a, low, high);
+            quickSort(a, 0, middle - 1);
+            quickSort(a, middle + 1, high);
+        }
+    }
+
+
+    private static int getMiddle(int[] a, int low, int high) {
+        int temp = a[low];//基准元素
+        while (low < high) {
+            while (low < high && a[high] >= temp) {
+                high--;
+            }
+            a[low] = a[high];
+            while (low < high && a[low] <= temp) {
+                low++;
+            }
+            a[high] = a[low];
+        }
+        a[low] = temp;
+        return low;
+    }
+
+    //=====================================================================================================
+
+
+    /**
+     * 归并排序
+     */
+    static void MergingSort(int[] a) {
+        mergeSort(a, 0, a.length - 1);
+
+        for (int anA : a) {
+            Log.e(TAG, anA + "");
+        }
+    }
+
+
+    private static void mergeSort(int[] a, int left, int right) {
+        if (left < right) {
+            int middle = (left + right) / 2;
+            mergeSort(a, left, middle);
+            mergeSort(a, middle + 1, right);
+            merge(a, left, middle, right);
+        }
+    }
+
+
+    private static void merge(int[] a, int left, int middle, int right) {
+        int[] tmpArr = new int[a.length];
+        int mid = middle + 1;//右边起始位置
+        int tmp = left;
+        int third = left;
+        while (left <= middle && mid <= right) {
+            if (a[left] <= a[mid]) {
+                tmpArr[third++] = a[left++];
+            } else {
+                tmpArr[third++] = a[mid++];
+            }
+        }
+        while (left <= middle) {
+            tmpArr[third++] = a[left++];
+        }
+        while (mid <= right) {
+            tmpArr[third++] = a[mid++];
+        }
+        while (tmp <= right) {
+            a[tmp] = tmpArr[tmp++];
+        }
+    }
+
+    //=====================================================================================================
+
+
+    /**
+     * 基数排序
+     */
+    static void RadixSort(int[] array) {
+        //查找最大数确定要排序次数
+        int max = 0;
+        for (int i = 0; i < array.length; i++) {
+            if (max < array[i]) {
+                max = array[i];
+            }
+        }
+        //判断位数
+        int times = 0;
+        while (max > 0) {
+            max = max / 10;
+            times++;
+        }
+        //十个队列
+        List<ArrayList> queue = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            ArrayList queue1 = new ArrayList();
+            queue.add(queue1);
+        }
+        //进行times次分配和收集
+        for (int i = 0; i < times; i++) {
+            for (int j = 0; j < array.length; j++) {
+                int x = array[j] % (int) Math.pow(10, i + 1) / (int) Math.pow(10, i);
+                ArrayList queue2 = queue.get(x);
+                queue2.add(array[j]);
+                queue.set(x, queue2);
+            }
+            int count = 0;
+            for (int j = 0; j < 10; j++) {
+                while (queue.get(j).size() > 0) {
+                    ArrayList<Integer> queue3 = queue.get(j);
+                    array[count] = queue3.get(0);
+                    queue3.remove(0);
+                    count++;
+                }
+            }
+        }
+
+        for (int anA : array) {
+            Log.e(TAG, anA + "");
         }
     }
 }
